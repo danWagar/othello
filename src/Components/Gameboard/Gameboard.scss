@@ -1,0 +1,29 @@
+.Gameboard {
+}
+
+.Gameboard_row {
+  display: flex;
+  list-style: none;
+  width: fit-content;
+  padding: 0;
+  margin: 0;
+  background-color: grey;
+  border-bottom: 2px solid black;
+
+  & li {
+    display: grid;
+    place-items: center;
+    height: 50px;
+    width: 50px;
+    padding: 0;
+    border-right: 2px solid black;
+  }
+
+  & li:first-child {
+    border-left: 2px solid black;
+  }
+}
+
+.Gameboard_row:first-child {
+  border-top: 2px solid black;
+}
