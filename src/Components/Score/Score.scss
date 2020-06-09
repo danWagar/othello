@@ -1,0 +1,30 @@
+.Score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 340px;
+  height: 150px;
+  font-family: 'Lato', sans-serif;
+  font-weight: bold;
+}
+
+.Score_container {
+  display: grid;
+  place-items: center;
+  width: 80px;
+}
+
+.Score_player {
+  font-size: 1.2em;
+}
+
+.Score_score {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 40px;
+  margin-top: 10px;
+  border-radius: 10px;
+  font-size: 1.4em;
+  background-color: rgb(24, 24, 24);
+}

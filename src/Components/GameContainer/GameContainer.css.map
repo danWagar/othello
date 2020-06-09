@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,cAAc,CAAC;EACb,OAAO,EAAE,IAAI;EACb,cAAc,EAAE,MAAM;EACtB,WAAW,EAAE,MAAM;EACnB,KAAK,EAAE,IAAI;EACX,KAAK,EAAE,KAAK;CACb",
+    "sources": [
+        "GameContainer.scss"
+    ],
+    "names": [],
+    "file": "GameContainer.css"
+}

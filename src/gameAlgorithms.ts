@@ -4,7 +4,7 @@ Algorithm:
 we recursively iterate through all potential combos of rows, columns and diagonals.
 
 if we find a blank followed by opponent piece, search until we find a hero piece and mark original blank as playable, 
-    unless we firse encounter a blank.
+    unless we first encounter a blank.
 
 if we find hero piece followed by an opponent piece, search until we encounter a blank and mark the blank as playable,
     unless we first encounter a hero piece.
@@ -17,9 +17,9 @@ interface iPosition {
   j: number;
 }
 
-export function searchForMoves(gameboard: string[][], playerColor: string) {
-  const markedBoard = gameboard.map((row, i) => row.map((square, j) => square));
-  //we use a nested function to avoid having to pass gameboard and playerColor in our recursive function
+export function searchForMoves(gameBoard: string[][], playerColor: string) {
+  const markedBoard = gameBoard.map((row, i) => row.map((square, j) => square));
+  //we use a nested function to avoid having to pass gameBoard and playerColor in our recursive function
   const mapMoves = (
     i: number,
     j: number,
@@ -28,10 +28,10 @@ export function searchForMoves(gameboard: string[][], playerColor: string) {
     lastPotentialMove: iPosition | null = null,
     lastHeroPosition: iPosition | null = null
   ) => {
-    if (i >= gameboard.length - 1 || j >= gameboard.length - 1 || i < 0 || j < 0) return;
+    if (i >= gameBoard.length - 1 || j >= gameBoard.length - 1 || i < 0 || j < 0) return;
 
-    const current = gameboard[i][j];
-    const next = gameboard[i + incrementI][j + incrementJ];
+    const current = gameBoard[i][j];
+    const next = gameBoard[i + incrementI][j + incrementJ];
 
     //check for case of blank square followed by opponent owned square
     //we remember the blank square in case a move is possible further down the line
@@ -70,7 +70,7 @@ export function searchForMoves(gameboard: string[][], playerColor: string) {
     mapMoves(i + incrementI, j + incrementJ, incrementI, incrementJ, lastPotentialMove, lastHeroPosition);
   };
 
-  for (let i = 0; i < gameboard.length; i++) {
+  for (let i = 0; i < gameBoard.length; i++) {
     //map rows
     mapMoves(i, 0, 0, 1);
     //map columns
@@ -80,9 +80,9 @@ export function searchForMoves(gameboard: string[][], playerColor: string) {
     //map left to right 'downward' sloping diagonals
     mapMoves(0, i, 1, -1);
     //map left to right 'upward' sloping diagonals
-    mapMoves(gameboard.length, i, -1, 1);
+    mapMoves(gameBoard.length, i, -1, 1);
     //map right to left 'upward' sloping diagonals
-    mapMoves(gameboard.length, i, -1, -1);
+    mapMoves(gameBoard.length, i, -1, -1);
   }
 
   return markedBoard;
@@ -94,10 +94,10 @@ function isOpponent(playerColor: string, square: string) {
   return true;
 }
 
-export function updateBoard(gameboard: string[][], row: number, column: number, playerColor: string) {
+export function updateBoard(gameBoard: string[][], row: number, column: number, playerColor: string) {
   const originalPosition = { i: row, j: column };
 
-  const changedBoard = gameboard.map((_row, i) =>
+  const changedBoard = gameBoard.map((_row, i) =>
     _row.map((square, j) => {
       if (i === row && j === column) {
         return playerColor;
@@ -109,7 +109,7 @@ export function updateBoard(gameboard: string[][], row: number, column: number, 
   const makeUpdates = (i: number, j: number, incrementI: number, incrementJ: number): boolean => {
     const atStart = i === originalPosition.i && j === originalPosition.j;
 
-    if (i >= gameboard.length || j >= gameboard.length || i < 0 || j < 0 || !changedBoard[i][j]) return false;
+    if (i >= gameBoard.length || j >= gameBoard.length || i < 0 || j < 0 || !changedBoard[i][j]) return false;
     if (changedBoard[i][j] === playerColor && !atStart) return true;
 
     let changed = makeUpdates(i + incrementI, j + incrementJ, incrementI, incrementJ);
@@ -136,6 +136,21 @@ export function updateBoard(gameboard: string[][], row: number, column: number, 
   makeUpdates(row, column, -1, -1);
 
   return changedBoard;
+}
+
+export function getScore(gameBoard: string[][]) {
+  let blackCount = 0;
+  let whiteCount = 0;
+
+  for (let i = 0; i < gameBoard.length; i++) {
+    for (let j = 0; j < gameBoard.length; j++) {
+      const current = gameBoard[i][j];
+      if (current === 'b') blackCount++;
+      else if (current === 'w') whiteCount++;
+    }
+  }
+
+  return { b: blackCount, w: whiteCount };
 }
 
 // export function testMapRowColumnOrDiagonalMoves() {

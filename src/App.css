@@ -1,8 +1,11 @@
 .App {
-  display: -ms-grid;
-  display: grid;
-  place-items: center;
-  height: 100vh;
-  width: 100vw;
+  width: 100%;
+}
+
+.App_header {
+  width: 100%;
+  margin-top: 10px;
+  text-align: center;
+  color: white;
 }
 /*# sourceMappingURL=App.css.map */

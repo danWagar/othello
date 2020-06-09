@@ -3,6 +3,9 @@
   background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(30, 30, 30, 0.6)), to(rgba(30, 30, 30, 0.6))), url("../../images/wood.jpg");
   background-image: linear-gradient(rgba(30, 30, 30, 0.6), rgba(30, 30, 30, 0.6)), url("../../images/wood.jpg");
   background-size: cover;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
 }
 
 .Gameboard_row {
@@ -26,13 +29,20 @@
   display: -ms-grid;
   display: grid;
   place-items: center;
-  height: 60px;
-  width: 60px;
+  height: calc(100vw / 8);
+  width: calc(100vw / 8);
   padding: 0;
   border-right: 2px solid rgba(30, 30, 30, 0.6);
 }
 
 .Gameboard_row li:first-child {
   border-left: 2px solid rgba(30, 30, 30, 0.6);
+}
+
+@media (min-width: 750px) {
+  .Gameboard_row li {
+    height: 60px;
+    width: 60px;
+  }
 }
 /*# sourceMappingURL=Gameboard.css.map */

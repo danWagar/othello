@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
-import Gameboard from './Components/Gameboard/Gameboard';
-import initialGameboard from './initialGameboard';
+import React from 'react';
+import GameContainer from './Components/GameContainer/GameContainer';
 import './App.css';
 
 function App() {
-  const [gameboard, setGameboard] = useState<string[][]>(initialGameboard);
-
   return (
     <div className="App">
-      <Gameboard gameState={gameboard} />
+      <h1 className="App_header">Othello</h1>
+      <GameContainer />
     </div>
   );
 }
