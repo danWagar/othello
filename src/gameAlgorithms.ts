@@ -22,7 +22,7 @@ interface iLastPotentialMove {
   j: number;
 }
 
-export function getMoves(gameboard: string[][], playerColor: string) {
+export default function searchForMoves(gameboard: string[][], playerColor: string) {
   //we use a nested function to avoid having to pass gameboard and playerColor in our recursive function
   const mapMoves = (
     i: number,

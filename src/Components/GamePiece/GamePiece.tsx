@@ -11,23 +11,31 @@ const GamePiece: React.FC<iGamePiece> = (props) => {
   const pieceStyle: Properties = {
     height: '85%',
     width: '85%',
+    borderRadius: '50%',
   };
 
   const whitePiece: Properties = {
     ...pieceStyle,
     backgroundColor: 'white',
-    borderRadius: '50%',
+    border: '1px solid #313131',
+    boxShadow: '0px -5px 25px rgba(42, 42, 42, 0.9) inset',
   };
 
   const blackPiece: Properties = {
     ...pieceStyle,
-    backgroundColor: 'black',
-    borderRadius: '50%',
+    backgroundColor: 'rgb(100, 100, 100)',
+    boxShadow: '0px -5px 25px 5px rgb(0, 0, 0) inset',
+  };
+
+  const possibleMove: Properties = {
+    ...pieceStyle,
+    border: '3px solid rgba(235, 60, 60, .6)',
   };
 
   const getStyle = () => {
     if (type === 'w') return whitePiece;
     else if (type === 'b') return blackPiece;
+    else if (type === 'p') return possibleMove;
     return {};
   };
 

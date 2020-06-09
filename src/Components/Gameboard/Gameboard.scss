@@ -1,4 +1,9 @@
+$border: 2px solid rgba(30, 30, 30, 0.6);
+
 .Gameboard {
+  background-image: linear-gradient(rgba(30, 30, 30, 0.6), rgba(30, 30, 30, 0.6)),
+    url('../../images/wood.jpeg');
+  background-size: cover;
 }
 
 .Gameboard_row {
@@ -7,23 +12,22 @@
   width: fit-content;
   padding: 0;
   margin: 0;
-  background-color: grey;
-  border-bottom: 2px solid black;
+  border-bottom: $border;
+
+  &:first-child {
+    border-top: $border;
+  }
 
   & li {
     display: grid;
     place-items: center;
-    height: 50px;
-    width: 50px;
+    height: 60px;
+    width: 60px;
     padding: 0;
-    border-right: 2px solid black;
+    border-right: $border;
   }
 
   & li:first-child {
-    border-left: 2px solid black;
+    border-left: $border;
   }
-}
-
-.Gameboard_row:first-child {
-  border-top: 2px solid black;
 }
