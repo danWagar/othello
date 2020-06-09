@@ -1,8 +1,9 @@
 $border: 2px solid rgba(30, 30, 30, 0.6);
 
 .Gameboard {
+  position: relative;
   background-image: linear-gradient(rgba(30, 30, 30, 0.6), rgba(30, 30, 30, 0.6)),
-    url('../../images/wood.jpeg');
+    url('../../images/wood.jpg');
   background-size: cover;
 }
 

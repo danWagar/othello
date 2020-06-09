@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GamePiece from '../GamePiece/GamePiece';
-import searchForMoves from '../../gameAlgorithms';
+import { searchForMoves, updateBoard } from '../../gameAlgorithms';
+import initialGameboard from '../../initialGameboard';
 import './Gameboard.css';
 
 //our gameboard is a 2d string array where the empty string represents a blank square,
@@ -13,24 +14,35 @@ interface iGameboard {
 }
 
 const Gameboard: React.FC<iGameboard> = (props) => {
-  let { gameState } = props;
-  let gameBoard = gameState.map((row) => row.map((square) => square));
-  const [playerTurn, setPlayerTurn] = useState<string>('b');
-  gameBoard = searchForMoves(gameBoard, playerTurn);
+  //let gameBoard = gameState.map((row) => row.map((square) => square));
   //valid options for playerTurn are 'w' and 'b';
+  const [playerTurn, setPlayerTurn] = useState<string>('b');
+
+  const [gameBoard, setGameBoard] = useState<string[][]>(initialGameboard);
 
   useEffect(() => {
-    gameBoard = searchForMoves(gameBoard, playerTurn);
+    let boardCopy = gameBoard.map((row) => row.map((square) => square));
+    setGameBoard(searchForMoves(boardCopy, playerTurn));
   }, [playerTurn]);
 
-  console.log(gameBoard);
+  const handleSquareClick = (e: React.MouseEvent<HTMLLIElement>) => {
+    const row = parseInt(e.currentTarget.getAttribute('data-row')!);
+    const column = parseInt(e.currentTarget.getAttribute('data-column')!);
+
+    if (gameBoard[row][column] !== 'p') return;
+
+    const changedBoard = updateBoard(gameBoard, row, column, playerTurn);
+
+    setGameBoard(changedBoard);
+    setPlayerTurn(playerTurn === 'w' ? 'b' : 'w');
+  };
 
   const getGameboardJSX = () => {
     return gameBoard.map((row, i) => {
       return (
         <ul key={i} className="Gameboard_row">
           {row.map((square, j) => (
-            <li key={j} id={`${i},${j}`}>
+            <li key={j} data-row={i} data-column={j} onClick={handleSquareClick}>
               <GamePiece type={square} />
             </li>
           ))}

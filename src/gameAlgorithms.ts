@@ -12,25 +12,20 @@ if we find hero piece followed by an opponent piece, search until we encounter a
 we iterate through the 2d array in 4 directions so O(4*n^2) -> O(n^2)
 */
 
-interface iLastHeroPosition {
+interface iPosition {
   i: number;
   j: number;
 }
 
-interface iLastPotentialMove {
-  i: number;
-  j: number;
-}
-
-export default function searchForMoves(gameboard: string[][], playerColor: string) {
+export function searchForMoves(gameboard: string[][], playerColor: string) {
   //we use a nested function to avoid having to pass gameboard and playerColor in our recursive function
   const mapMoves = (
     i: number,
     j: number,
     incrementI: number,
     incrementJ: number,
-    lastPotentialMove: iLastPotentialMove | null = null,
-    lastHeroPosition: iLastHeroPosition | null = null
+    lastPotentialMove: iPosition | null = null,
+    lastHeroPosition: iPosition | null = null
   ) => {
     if (i >= gameboard.length - 1 || j >= gameboard.length - 1 || i < 0 || j < 0) return;
 
@@ -99,6 +94,93 @@ function isOpponent(playerColor: string, square: string) {
   if (!square) return false;
   if (square === playerColor) return false;
   return true;
+}
+
+export function updateBoard(gameboard: string[][], row: number, column: number, playerColor: string) {
+  console.log('playerColor is ', playerColor);
+  const originalPosition = { i: row, j: column };
+  const changedBoard = gameboard.map((_row, i) =>
+    _row.map((square, j) => {
+      if (i === row && j === column) {
+        return playerColor;
+      } else if (square === 'p') return '';
+      return square;
+    })
+  );
+  const makeUpdates = (i: number, j: number, incrementI: number, incrementJ: number): boolean => {
+    const current = changedBoard[i][j];
+    const atStart = i === originalPosition.i && j === originalPosition.j;
+
+    if (i > gameboard.length || j > gameboard.length || i < 0 || j < 0 || !current) return false;
+    if (current === playerColor && !atStart) return true;
+
+    if (makeUpdates(i + incrementI, j + incrementJ, incrementI, incrementJ) && !atStart)
+      changedBoard[i][j] = playerColor;
+
+    // let change = false;
+
+    // if(direction === 'RIGHT') change = makeUpdates(i, j + 1, 'RIGHT');
+    // if (change && !atStart) changedBoard[i][j] = playerColor;
+    // i = row;
+    // j = column;
+    // //check left
+    // direction = 'LEFT';
+    // change = makeUpdates(i, j - 1, 'LEFT');
+    // if (change && !atStart) changedBoard[i][j] = playerColor;
+    // i = row;
+    // j = column;
+    // //check down
+    // direction = 'DOWN'
+    // change = makeUpdates(i + 1, j, 'DOWN');
+    // if (change && !atStart) changedBoard[i][j] = playerColor;
+    // i = row;
+    // j = column;
+    // //check up
+    // direction = 'UP'
+    // change = makeUpdates(i - 1, j);
+    // if (change && !atStart) changedBoard[i][j] = playerColor;
+    // i = row;
+    // j = column;
+    // //check right downward diagonal
+    // change = makeUpdates(i + 1, j + 1);
+    // if (change && !atStart) changedBoard[i][j] = playerColor;
+    // i = row;
+    // j = column;
+    // //check left downward diagonal
+    // change = makeUpdates(i + 1, j - 1);
+    // if (change && !atStart) changedBoard[i][j] = playerColor;
+    // i = row;
+    // j = column;
+    // //check right upward diagonal
+    // change = makeUpdates(i - 1, j + 1);
+    // if (change && !atStart) changedBoard[i][j] = playerColor;
+    // i = row;
+    // j = column;
+    // //check left upward diagonal
+    // change = makeUpdates(i - 1, j - 1);
+    // if (change && !atStart) changedBoard[i][j] = playerColor;
+
+    return false;
+  };
+
+  //change to right
+  makeUpdates(row, column, 0, 1);
+  //change to left
+  makeUpdates(row, column, 0, -1);
+  //change to down
+  makeUpdates(row, column, 1, 0);
+  //change to up
+  makeUpdates(row, column, -1, 0);
+  //change to bottom right
+  makeUpdates(row, column, 1, 1);
+  //change to bottom left
+  makeUpdates(row, column, 1, -1);
+  //change to top right
+  makeUpdates(row, column, -1, 1);
+  //change to top left
+  makeUpdates(row, column, -1, -1);
+
+  return changedBoard;
 }
 
 // export function testMapRowColumnOrDiagonalMoves() {
