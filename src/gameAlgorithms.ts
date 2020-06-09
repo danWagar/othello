@@ -18,6 +18,7 @@ interface iPosition {
 }
 
 export function searchForMoves(gameboard: string[][], playerColor: string) {
+  const markedBoard = gameboard.map((row, i) => row.map((square, j) => square));
   //we use a nested function to avoid having to pass gameboard and playerColor in our recursive function
   const mapMoves = (
     i: number,
@@ -48,14 +49,14 @@ export function searchForMoves(gameboard: string[][], playerColor: string) {
     //and mark playable if lastHeroPosition not null
     else if (isOpponent(playerColor, current) && !next) {
       if (lastHeroPosition) {
-        gameboard[i + incrementI][j + incrementJ] = 'p';
+        markedBoard[i + incrementI][j + incrementJ] = 'p';
         lastHeroPosition = null;
       }
     }
     //if there was a previous potential move, this is the case where that move
     //is shown to be playable
     else if (current === playerColor) {
-      if (lastPotentialMove) gameboard[lastPotentialMove.i][lastPotentialMove.j] = 'p';
+      if (lastPotentialMove) markedBoard[lastPotentialMove.i][lastPotentialMove.j] = 'p';
       lastPotentialMove = null;
       lastHeroPosition = { i: i, j: j };
     }
@@ -87,7 +88,7 @@ export function searchForMoves(gameboard: string[][], playerColor: string) {
     mapMoves(gameboard.length, i, -1, -1);
   }
 
-  return gameboard;
+  return markedBoard;
 }
 
 function isOpponent(playerColor: string, square: string) {
@@ -97,8 +98,8 @@ function isOpponent(playerColor: string, square: string) {
 }
 
 export function updateBoard(gameboard: string[][], row: number, column: number, playerColor: string) {
-  console.log('playerColor is ', playerColor);
   const originalPosition = { i: row, j: column };
+
   const changedBoard = gameboard.map((_row, i) =>
     _row.map((square, j) => {
       if (i === row && j === column) {
@@ -107,60 +108,17 @@ export function updateBoard(gameboard: string[][], row: number, column: number, 
       return square;
     })
   );
+
   const makeUpdates = (i: number, j: number, incrementI: number, incrementJ: number): boolean => {
-    const current = changedBoard[i][j];
     const atStart = i === originalPosition.i && j === originalPosition.j;
 
-    if (i > gameboard.length || j > gameboard.length || i < 0 || j < 0 || !current) return false;
-    if (current === playerColor && !atStart) return true;
+    if (i > gameboard.length || j > gameboard.length || i < 0 || j < 0 || !changedBoard[i][j]) return false;
+    if (changedBoard[i][j] === playerColor && !atStart) return true;
 
-    if (makeUpdates(i + incrementI, j + incrementJ, incrementI, incrementJ) && !atStart)
-      changedBoard[i][j] = playerColor;
+    let changed = makeUpdates(i + incrementI, j + incrementJ, incrementI, incrementJ);
+    if (changed && !atStart) changedBoard[i][j] = playerColor;
 
-    // let change = false;
-
-    // if(direction === 'RIGHT') change = makeUpdates(i, j + 1, 'RIGHT');
-    // if (change && !atStart) changedBoard[i][j] = playerColor;
-    // i = row;
-    // j = column;
-    // //check left
-    // direction = 'LEFT';
-    // change = makeUpdates(i, j - 1, 'LEFT');
-    // if (change && !atStart) changedBoard[i][j] = playerColor;
-    // i = row;
-    // j = column;
-    // //check down
-    // direction = 'DOWN'
-    // change = makeUpdates(i + 1, j, 'DOWN');
-    // if (change && !atStart) changedBoard[i][j] = playerColor;
-    // i = row;
-    // j = column;
-    // //check up
-    // direction = 'UP'
-    // change = makeUpdates(i - 1, j);
-    // if (change && !atStart) changedBoard[i][j] = playerColor;
-    // i = row;
-    // j = column;
-    // //check right downward diagonal
-    // change = makeUpdates(i + 1, j + 1);
-    // if (change && !atStart) changedBoard[i][j] = playerColor;
-    // i = row;
-    // j = column;
-    // //check left downward diagonal
-    // change = makeUpdates(i + 1, j - 1);
-    // if (change && !atStart) changedBoard[i][j] = playerColor;
-    // i = row;
-    // j = column;
-    // //check right upward diagonal
-    // change = makeUpdates(i - 1, j + 1);
-    // if (change && !atStart) changedBoard[i][j] = playerColor;
-    // i = row;
-    // j = column;
-    // //check left upward diagonal
-    // change = makeUpdates(i - 1, j - 1);
-    // if (change && !atStart) changedBoard[i][j] = playerColor;
-
-    return false;
+    return changed;
   };
 
   //change to right
