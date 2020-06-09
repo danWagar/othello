@@ -37,8 +37,8 @@ export function searchForMoves(gameboard: string[][], playerColor: string) {
     //we remember the blank square in case a move is possible further down the line
     if (!current && isOpponent(playerColor, next)) {
       lastPotentialMove = { i: i, j: j };
-      i += incrementI;
-      j += incrementJ;
+      //i += incrementI;
+      //j += incrementJ;
     }
     //check for case where there is a hero piece followed by opponent piece
     //remember position of hero piece in case a move will be possible
@@ -70,9 +70,6 @@ export function searchForMoves(gameboard: string[][], playerColor: string) {
     mapMoves(i + incrementI, j + incrementJ, incrementI, incrementJ, lastPotentialMove, lastHeroPosition);
   };
 
-  //map rows, columns, and top half diagonals
-  //we could make optimization by avoiding to search the diagonals in the corners where length less than two,
-  //but it is quite negligible
   for (let i = 0; i < gameboard.length; i++) {
     //map rows
     mapMoves(i, 0, 0, 1);
@@ -112,7 +109,7 @@ export function updateBoard(gameboard: string[][], row: number, column: number, 
   const makeUpdates = (i: number, j: number, incrementI: number, incrementJ: number): boolean => {
     const atStart = i === originalPosition.i && j === originalPosition.j;
 
-    if (i > gameboard.length || j > gameboard.length || i < 0 || j < 0 || !changedBoard[i][j]) return false;
+    if (i >= gameboard.length || j >= gameboard.length || i < 0 || j < 0 || !changedBoard[i][j]) return false;
     if (changedBoard[i][j] === playerColor && !atStart) return true;
 
     let changed = makeUpdates(i + incrementI, j + incrementJ, incrementI, incrementJ);
