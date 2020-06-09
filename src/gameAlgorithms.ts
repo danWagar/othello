@@ -1,56 +1,98 @@
-export function getMoves(gameboard: string[][]) {}
+/* 
+Algorithm:
 
-/* if we find a blank followed by opponent piece, search until we find hero piece and mark original blank as possible play, 
-       unless we find a blank then continue search.
-   
-   if we find opponent piece followed by blank, mark blank as possible play when last square visited that did not
-       contain an opponent piece contained a hero piece.
+we recursively iterate through all potential combos of rows, columns and diagonals.
+
+if we find a blank followed by opponent piece, search until we find a hero piece and mark original blank as playable, 
+    unless we firse encounter a blank.
+
+if we find hero piece followed by an opponent piece, search until we encounter a blank and mark the blank as playable,
+    unless we first encounter a hero piece.
+
+we iterate through the 2d array in 4 directions so O(4*n^2) -> O(n^2)
 */
 
-interface iLastNonHeroPiece {
-  type: string;
-  index: number;
+interface iLastHeroPosition {
+  i: number;
+  j: number;
 }
 
-function mapRowColumnOrDiagonalMoves(row: string[], playerColor: string) {
-  let lastNonHeroPiece: iLastNonHeroPiece | null = null;
-  for (let i = 0; i < row.length; i++) {
-    console.log('in for loop i is ' + i);
+interface iLastPotentialMove {
+  i: number;
+  j: number;
+}
 
-    //blank followed by opponent piece
-    if (!row[i] && isOpponent(playerColor, row[i + 1])) {
-      console.log('found blank followed by opponent piece');
-      console.log('current square is index ' + i + ' containing ' + row[i]);
-      const blank = i;
-      let foundMove = false;
-      i += 2;
-      while (i < row.length && !foundMove) {
-        console.log('current square is index ' + i + ' containing ' + row[i]);
-        if (!row[i]) {
-          console.log('this square is blank');
-          lastNonHeroPiece = { type: row[i], index: i };
-          i--; //so we don't skip test case for blank followed by opposite in for loop;
-          break;
-        } else if (row[i] === playerColor) {
-          row[blank] = 'p';
-          foundMove = true;
-          i++;
-        } else i++;
+export function getMoves(gameboard: string[][], playerColor: string) {
+  //we use a nested function to avoid having to pass gameboard and playerColor in our recursive function
+  const mapMoves = (
+    i: number,
+    j: number,
+    incrementI: number,
+    incrementJ: number,
+    lastPotentialMove: iLastPotentialMove | null = null,
+    lastHeroPosition: iLastHeroPosition | null = null
+  ) => {
+    if (i >= gameboard.length - 1 || j >= gameboard.length - 1 || i < 0 || j < 0) return;
+
+    const current = gameboard[i][j];
+    const next = gameboard[i + incrementI][j + incrementJ];
+
+    //check for case of blank square followed by opponent owned square
+    //we remember the blank square in case a move is possible further down the line
+    if (!current && isOpponent(playerColor, next)) {
+      lastPotentialMove = { i: i, j: j };
+      i += incrementI;
+      j += incrementJ;
+    }
+    //check for case where there is a hero piece followed by opponent piece
+    //remember position of hero piece in case a move will be possible
+    else if (current === playerColor && isOpponent(playerColor, next)) {
+      lastHeroPosition = { i: i, j: j };
+    }
+    //check for opponent square followed by blank square
+    //and mark playable if lastHeroPosition not null
+    else if (isOpponent(playerColor, current) && !next) {
+      if (lastHeroPosition) {
+        gameboard[i + incrementI][j + incrementJ] = 'p';
+        lastHeroPosition = null;
       }
     }
-    //opponent piece followed by blank
-    else if (isOpponent(playerColor, row[i]) && !row[i + 1]) {
-      const found = i + 1;
-
-      if (lastNonHeroPiece && lastNonHeroPiece.type === playerColor) row[found] = 'p';
-
-      lastNonHeroPiece = { type: row[found], index: found };
-    } else if (!isOpponent(playerColor, row[i])) {
-      lastNonHeroPiece = { type: row[i], index: i };
+    //if there was a previous potential move, this is the case where that move
+    //is shown to be playable
+    else if (current === playerColor) {
+      if (lastPotentialMove) gameboard[lastPotentialMove.i][lastPotentialMove.j] = 'p';
+      lastPotentialMove = null;
+      lastHeroPosition = { i: i, j: j };
     }
+    //when we encounter a blank that does not represent a potential move,
+    //it means no potential previous moves, so we reset
+    else if (!current) {
+      if (lastPotentialMove) lastPotentialMove = null;
+      if (lastHeroPosition) lastHeroPosition = null;
+    }
+
+    mapMoves(i + incrementI, j + incrementJ, incrementI, incrementJ, lastPotentialMove, lastHeroPosition);
+  };
+
+  //map rows, columns, and top half diagonals
+  //we could make optimization by avoiding to search the diagonals in the corners where length less than two,
+  //but it is quite negligible
+  for (let i = 0; i < gameboard.length; i++) {
+    //map rows
+    mapMoves(i, 0, 0, 1);
+    //map columns
+    mapMoves(0, i, 1, 0);
+    //map right to left 'downward' sloping diagonals
+    mapMoves(0, i, 1, 1);
+    //map left to right 'downward' sloping diagonals
+    mapMoves(0, i, 1, -1);
+    //map left to right 'upward' sloping diagonals
+    mapMoves(gameboard.length, i, -1, 1);
+    //map right to left 'upward' sloping diagonals
+    mapMoves(gameboard.length, i, -1, -1);
   }
 
-  return row;
+  return gameboard;
 }
 
 function isOpponent(playerColor: string, square: string) {
@@ -59,30 +101,43 @@ function isOpponent(playerColor: string, square: string) {
   return true;
 }
 
-export function testMapRowColumnOrDiagonalMoves() {
-  let testArrs = [
-    ['', 'b', 'b', '', 'b', 'b', 'b', 'w'],
-    ['w', '', 'w', 'b', 'b', 'b', 'b', ''],
-  ];
+// export function testMapRowColumnOrDiagonalMoves() {
+//   let testArrs = [
+//     ['', '', '', '', '', '', '', ''],
+//     ['', '', '', '', '', '', '', ''],
+//     ['', '', '', '', '', '', '', ''],
+//     ['', '', '', 'w', 'b', '', '', ''],
+//     ['', '', '', 'b', 'w', '', '', ''],
+//     ['', '', '', '', 'w', '', '', ''],
+//     ['', '', '', '', '', '', '', ''],
+//     ['', '', '', '', '', '', '', ''],
+//   ];
 
-  let expected = [
-    ['', 'b', 'b', 'p', 'b', 'b', 'b', 'w'],
+//   let expected = [
+//     ['', '', '', '', '', '', '', ''],
+//     ['', '', '', '', '', '', '', ''],
+//     ['', '', '', 'p', '', '', '', ''],
+//     ['', '', 'p', 'w', 'b', '', '', ''],
+//     ['', '', '', 'b', 'w', 'p', '', ''],
+//     ['', '', '', '', 'p', '', '', ''],
+//     ['', '', '', '', '', '', '', ''],
+//     ['', '', '', '', '', '', '', ''],
+//   ];
 
-    ['w', '', 'w', 'b', 'b', 'b', 'b', 'p'],
-  ];
+// let passing = true;
+// for (let i = 0; i < testArrs.length; i++) {
+//   const result = mapRowColumnOrDiagonalMoves(testArrs[i], 'w');
+//   if (!isSame(result, expected[i])) {
+//     console.log('test failed compairing result: ', result, ' to expected', expected[i]);
+//     passing = false;
+//   }
+// }
 
-  let passing = true;
-  for (let i = 0; i < testArrs.length; i++) {
-    const result = mapRowColumnOrDiagonalMoves(testArrs[i], 'w');
-    if (!isSame(result, expected[i])) {
-      console.log('test failed compairing result: ', result, ' to expected', expected[i]);
-      passing = false;
-    }
-  }
+//   const result = getMoves(testArrs, 'b');
 
-  return passing;
-}
+//   console.log('test failed compairing result: ', result, ' to expected', expected);
+// }
 
-function isSame(array1: string[], array2: string[]) {
-  return array1.length === array2.length && array1.every((element, index) => element === array2[index]);
-}
+// function isSame(array1: string[], array2: string[]) {
+//   return array1.length === array2.length && array1.every((element, index) => element === array2[index]);
+// }
