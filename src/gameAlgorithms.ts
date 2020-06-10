@@ -138,19 +138,21 @@ export function updateBoard(gameBoard: string[][], row: number, column: number, 
   return changedBoard;
 }
 
-export function getScore(gameBoard: string[][]) {
+export function getBoardCount(gameBoard: string[][]) {
   let blackCount = 0;
   let whiteCount = 0;
+  let pCount = 0;
 
   for (let i = 0; i < gameBoard.length; i++) {
     for (let j = 0; j < gameBoard.length; j++) {
       const current = gameBoard[i][j];
       if (current === 'b') blackCount++;
       else if (current === 'w') whiteCount++;
+      else if (current === 'p') pCount++;
     }
   }
 
-  return { b: blackCount, w: whiteCount };
+  return { b: blackCount, w: whiteCount, p: pCount };
 }
 
 // export function testMapRowColumnOrDiagonalMoves() {

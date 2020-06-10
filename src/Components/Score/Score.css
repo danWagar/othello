@@ -19,6 +19,8 @@
   display: grid;
   place-items: center;
   width: 80px;
+  padding: 5px;
+  border-radius: 10px;
 }
 
 .Score_player {
@@ -35,5 +37,9 @@
   border-radius: 10px;
   font-size: 1.4em;
   background-color: #181818;
+}
+
+.Score_highlight {
+  background-color: rgba(200, 60, 60, 0.6);
 }
 /*# sourceMappingURL=Score.css.map */

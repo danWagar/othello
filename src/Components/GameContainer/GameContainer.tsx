@@ -7,10 +7,11 @@ import './GameContainer.css';
 interface iScore {
   b: number;
   w: number;
+  current: string;
 }
 
 const GameContainer: React.FC = () => {
-  const [score, setScore] = useState<iScore>({ b: 2, w: 2 });
+  const [score, setScore] = useState<iScore>({ b: 2, w: 2, current: 'b' });
 
   const handleScoreChange = (score: iScore) => {
     setScore(score);
