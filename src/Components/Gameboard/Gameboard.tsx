@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { GameContext } from '../../Context/GameContext';
+import initialGameboard from '../../initialGameboard';
 import GamePiece from '../GamePiece/GamePiece';
 import {
   searchForMoves,
@@ -19,38 +21,30 @@ interface iScore {
   current: string;
 }
 
-interface iGameboard {
-  gameState: string[][];
-  updateScore: (score: iScore) => void;
-  playerColor: string;
-  newGame: () => void;
-}
+const Gameboard: React.FC = () => {
+  const { game, setGame } = useContext(GameContext);
 
-const Gameboard: React.FC<iGameboard> = (props) => {
-  const { gameState, updateScore, playerColor, newGame } = props;
-  //valid options for playerTurn are 'w' and 'b';
-  const [playerTurn, setPlayerTurn] = useState<string>('b');
-  const [gameBoard, setGameBoard] = useState<string[][]>(gameState);
-  const [gameOver, setGameOver] = useState<boolean>(false);
+  const { gameOver, playerColor, currentPlayerTurn } = game;
+  const [gameBoard, setGameBoard] = useState<string[][]>(initialGameboard);
 
   useEffect(() => {
     if (gameOver) return;
 
-    const boardCopy = searchForMoves(gameBoard, playerTurn);
+    const boardCopy = searchForMoves(gameBoard, currentPlayerTurn);
     setGameBoard(boardCopy);
 
     const counts = getBoardCount(boardCopy);
 
-    updateScore({ b: counts.b, w: counts.w, current: playerTurn });
+    setGame({ ...game, score: { b: counts.b, w: counts.w } });
 
-    if (checkGameOver(counts, playerTurn, boardCopy)) {
-      setGameOver(!gameOver);
+    if (checkGameOver(counts, currentPlayerTurn, boardCopy)) {
+      setGame({ ...game, gameOver: true });
       return;
     }
 
     if (counts.p === 0) switchTurns();
 
-    if (playerTurn !== playerColor) {
+    if (currentPlayerTurn !== playerColor) {
       const move = getRandomMove(boardCopy);
       setTimeout(() => {
         if (!move) {
@@ -60,21 +54,21 @@ const Gameboard: React.FC<iGameboard> = (props) => {
         handleBoardUpdate(move.i, move.j);
       }, 200);
     }
-  }, [playerTurn]);
+  }, [currentPlayerTurn]);
 
   const switchTurns = () => {
-    setPlayerTurn(playerTurn === 'w' ? 'b' : 'w');
+    setGame({ ...game, currentPlayerTurn: currentPlayerTurn === 'w' ? 'b' : 'w' });
   };
 
   const handleBoardUpdate = async (i: number, j: number) => {
-    const changedBoard = await updateBoard(gameBoard, i, j, playerTurn);
+    const changedBoard = await updateBoard(gameBoard, i, j, currentPlayerTurn);
     console.log('changed board is ', changedBoard);
     setGameBoard(changedBoard);
     switchTurns();
   };
 
   const handleSquareClick = (e: React.MouseEvent<HTMLLIElement>) => {
-    if (playerTurn !== playerColor) return;
+    if (currentPlayerTurn !== playerColor) return;
 
     const row = parseInt(e.currentTarget.getAttribute('data-row')!);
     const column = parseInt(e.currentTarget.getAttribute('data-column')!);
@@ -85,10 +79,15 @@ const Gameboard: React.FC<iGameboard> = (props) => {
   };
 
   const handleNewGameClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setPlayerTurn('b');
-    setGameBoard(gameState);
-    setGameOver(false);
-    newGame();
+    setGame({
+      ...game,
+      playerColor: '',
+      currentPlayerTurn: 'b',
+      gameOver: false,
+      start: false,
+      score: { b: 2, w: 2 },
+    });
+    setGameBoard(initialGameboard);
   };
 
   const getGameboardJSX = () => {

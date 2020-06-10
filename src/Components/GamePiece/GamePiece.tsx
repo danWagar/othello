@@ -29,6 +29,7 @@ const GamePiece: React.FC<iGamePiece> = (props) => {
 
   const possibleMove: Properties = {
     ...pieceStyle,
+    cursor: 'pointer',
     border: '3px solid rgba(235, 60, 60, .6)',
   };
 

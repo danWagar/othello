@@ -15,6 +15,7 @@
 }
 
 .Score_container {
+  cursor: pointer;
   display: -ms-grid;
   display: grid;
   place-items: center;

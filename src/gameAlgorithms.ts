@@ -46,8 +46,6 @@ export function searchForMoves(gameBoard: string[][], playerColor: string) {
     //we remember the blank square in case a move is possible further down the line
     if (!current && isOpponent(playerColor, next)) {
       lastPotentialMove = { i: i, j: j };
-      //i += incrementI;
-      //j += incrementJ;
     }
     //check for case where there is a hero piece followed by opponent piece
     //remember position of hero piece in case a move will be possible
@@ -176,8 +174,8 @@ export function getRandomMove(gameBoard: string[][]) {
   const possibleMoves: iPosition[] = [];
   gameBoard.map((row, i) => row.forEach((square, j) => square === 'p' && possibleMoves.push({ i: i, j: j })));
 
-  const random = Math.floor(Math.random() * possibleMoves.length);
-  const move = possibleMoves[random];
+  const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+
   if (move) return move;
   return null;
 }
@@ -186,7 +184,7 @@ export function getRandomMove(gameBoard: string[][]) {
   Win conditiions:
   1) board is full
   2) neither player can move
-  3) only piece of one color are on the baord
+  3) only pieces of one color are on the baord
 */
 export function checkGameOver(counts: iCounts, playerTurn: string, gameBoard: string[][]) {
   if (counts.b + counts.w === gameBoard.length * gameBoard.length) return true;
@@ -202,43 +200,3 @@ export function checkGameOver(counts: iCounts, playerTurn: string, gameBoard: st
 
   return false;
 }
-// export function testMapRowColumnOrDiagonalMoves() {
-//   let testArrs = [
-//     ['', '', '', '', '', '', '', ''],
-//     ['', '', '', '', '', '', '', ''],
-//     ['', '', '', '', '', '', '', ''],
-//     ['', '', '', 'w', 'b', '', '', ''],
-//     ['', '', '', 'b', 'w', '', '', ''],
-//     ['', '', '', '', 'w', '', '', ''],
-//     ['', '', '', '', '', '', '', ''],
-//     ['', '', '', '', '', '', '', ''],
-//   ];
-
-//   let expected = [
-//     ['', '', '', '', '', '', '', ''],
-//     ['', '', '', '', '', '', '', ''],
-//     ['', '', '', 'p', '', '', '', ''],
-//     ['', '', 'p', 'w', 'b', '', '', ''],
-//     ['', '', '', 'b', 'w', 'p', '', ''],
-//     ['', '', '', '', 'p', '', '', ''],
-//     ['', '', '', '', '', '', '', ''],
-//     ['', '', '', '', '', '', '', ''],
-//   ];
-
-// let passing = true;
-// for (let i = 0; i < testArrs.length; i++) {
-//   const result = mapRowColumnOrDiagonalMoves(testArrs[i], 'w');
-//   if (!isSame(result, expected[i])) {
-//     console.log('test failed compairing result: ', result, ' to expected', expected[i]);
-//     passing = false;
-//   }
-// }
-
-//   const result = getMoves(testArrs, 'b');
-
-//   console.log('test failed compairing result: ', result, ' to expected', expected);
-// }
-
-// function isSame(array1: string[], array2: string[]) {
-//   return array1.length === array2.length && array1.every((element, index) => element === array2[index]);
-// }
