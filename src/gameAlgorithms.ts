@@ -17,8 +17,14 @@ interface iPosition {
   j: number;
 }
 
+interface iCounts {
+  b: number;
+  w: number;
+  p: number;
+}
+
 export function searchForMoves(gameBoard: string[][], playerColor: string) {
-  const markedBoard = gameBoard.map((row, i) => row.map((square, j) => square));
+  const markedBoard = gameBoard.map((row, i) => row.map((square, j) => (square === 'p' ? '' : square)));
   //we use a nested function to avoid having to pass gameBoard and playerColor in our recursive function
   const mapMoves = (
     i: number,
@@ -163,9 +169,32 @@ export function getBoardCount(gameBoard: string[][]) {
 export function getRandomMove(gameBoard: string[][]) {
   const possibleMoves: iPosition[] = [];
   gameBoard.map((row, i) => row.forEach((square, j) => square === 'p' && possibleMoves.push({ i: i, j: j })));
-  console.log(possibleMoves);
 
-  return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  const random = Math.floor(Math.random() * possibleMoves.length);
+  const move = possibleMoves[random];
+  if (move) return move;
+  return null;
+}
+
+/*
+  Win conditiions:
+  1) board is full
+  2) neither player can move
+  3) only piece of one color are on the baord
+*/
+export function checkGameOver(counts: iCounts, playerTurn: string, gameBoard: string[][]) {
+  if (counts.b + counts.w === gameBoard.length * gameBoard.length) return true;
+
+  if (counts.p === 0) {
+    const nextTurnMoves = searchForMoves(gameBoard, playerTurn === 'w' ? 'b' : 'w');
+    const nextTurnCounts = getBoardCount(nextTurnMoves);
+
+    if (nextTurnCounts.p === 0) return true;
+  }
+
+  if (counts.b === 0 || counts.w === 0) return true;
+
+  return false;
 }
 // export function testMapRowColumnOrDiagonalMoves() {
 //   let testArrs = [

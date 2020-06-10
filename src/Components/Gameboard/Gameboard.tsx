@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import GamePiece from '../GamePiece/GamePiece';
-import { searchForMoves, updateBoard, getBoardCount, getRandomMove } from '../../gameAlgorithms';
+import {
+  searchForMoves,
+  updateBoard,
+  getBoardCount,
+  getRandomMove,
+  checkGameOver,
+} from '../../gameAlgorithms';
 import './Gameboard.css';
 
 //our gameboard is a 2d string array where the empty string represents a blank square,
@@ -30,25 +36,29 @@ const Gameboard: React.FC<iGameboard> = (props) => {
   useEffect(() => {
     if (gameOver) return;
 
-    let boardCopy = gameBoard.map((row) => row.map((square) => (square === 'p' ? '' : square)));
-    boardCopy = searchForMoves(boardCopy, playerTurn);
+    const boardCopy = searchForMoves(gameBoard, playerTurn);
     setGameBoard(boardCopy);
 
     const counts = getBoardCount(boardCopy);
 
     updateScore({ b: counts.b, w: counts.w, current: playerTurn });
 
-    if (counts.b + counts.w === gameBoard.length * gameBoard.length) setGameOver(!gameOver);
+    if (checkGameOver(counts, playerTurn, boardCopy)) {
+      setGameOver(!gameOver);
+      return;
+    }
+
     if (counts.p === 0) switchTurns();
 
-    console.log('playerColor is ', playerColor);
-
     if (playerTurn !== playerColor) {
+      const move = getRandomMove(boardCopy);
       setTimeout(() => {
-        const move = getRandomMove(boardCopy);
-        if (!move.i) switchTurns();
+        if (!move) {
+          switchTurns();
+          return;
+        }
         handleBoardUpdate(move.i, move.j);
-      }, 1000);
+      }, 200);
     }
   }, [playerTurn]);
 
@@ -56,20 +66,29 @@ const Gameboard: React.FC<iGameboard> = (props) => {
     setPlayerTurn(playerTurn === 'w' ? 'b' : 'w');
   };
 
-  const handleBoardUpdate = (i: number, j: number) => {
-    const changedBoard = updateBoard(gameBoard, i, j, playerTurn);
-
+  const handleBoardUpdate = async (i: number, j: number) => {
+    const changedBoard = await updateBoard(gameBoard, i, j, playerTurn);
+    console.log('changed board is ', changedBoard);
     setGameBoard(changedBoard);
     switchTurns();
   };
 
   const handleSquareClick = (e: React.MouseEvent<HTMLLIElement>) => {
+    if (playerTurn !== playerColor) return;
+
     const row = parseInt(e.currentTarget.getAttribute('data-row')!);
     const column = parseInt(e.currentTarget.getAttribute('data-column')!);
 
     if (gameBoard[row][column] !== 'p') return;
 
     handleBoardUpdate(row, column);
+  };
+
+  const handleNewGameClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setPlayerTurn('b');
+    setGameBoard(gameState);
+    setGameOver(false);
+    newGame();
   };
 
   const getGameboardJSX = () => {
@@ -84,13 +103,6 @@ const Gameboard: React.FC<iGameboard> = (props) => {
         </ul>
       );
     });
-  };
-
-  const handleNewGameClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setPlayerTurn('b');
-    setGameBoard(gameState);
-    setGameOver(false);
-    newGame();
   };
 
   return (

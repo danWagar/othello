@@ -27,6 +27,7 @@ const GameContainer: React.FC = () => {
     setStart(true);
   };
 
+  console.log('GameContainer start is ', start);
   return (
     <div className="GameContainer">
       <span className="GameContainer_watermark">Othello</span>

@@ -18,7 +18,7 @@ const GamePiece: React.FC<iGamePiece> = (props) => {
     ...pieceStyle,
     backgroundColor: 'white',
     border: '1px solid #313131',
-    boxShadow: '0px -5px 25px rgba(42, 42, 42, 0.9) inset',
+    boxShadow: '0px -5px 25px rgba(0, 0, 0, 0.9) inset',
   };
 
   const blackPiece: Properties = {

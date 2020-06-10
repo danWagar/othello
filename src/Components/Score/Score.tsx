@@ -16,6 +16,7 @@ interface iScore {
 
 const Score: React.FC<iScore> = (props) => {
   const { score, updateColor } = props;
+  console.log('in Score ', props.start);
   const [start, setStart] = useState<boolean>(props.start);
 
   const handleChoiceClick = (e: React.MouseEvent<HTMLDivElement>) => {
