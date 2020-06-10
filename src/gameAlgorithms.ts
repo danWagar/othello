@@ -53,6 +53,10 @@ export function searchForMoves(gameBoard: string[][], playerColor: string) {
     //remember position of hero piece in case a move will be possible
     else if (current === playerColor && isOpponent(playerColor, next)) {
       lastHeroPosition = { i: i, j: j };
+      if (lastPotentialMove) {
+        markedBoard[lastPotentialMove.i][lastPotentialMove.j] = 'p';
+        lastPotentialMove = null;
+      }
     }
     //check for opponent square followed by blank square
     //and mark playable if lastHeroPosition not null
@@ -67,9 +71,11 @@ export function searchForMoves(gameBoard: string[][], playerColor: string) {
     //if there was a previous potential move, this is the case where that move
     //is shown to be playable
     else if (current === playerColor) {
-      if (lastPotentialMove) markedBoard[lastPotentialMove.i][lastPotentialMove.j] = 'p';
-      lastPotentialMove = null;
-      lastHeroPosition = { i: i, j: j };
+      if (lastPotentialMove) {
+        markedBoard[lastPotentialMove.i][lastPotentialMove.j] = 'p';
+        lastPotentialMove = null;
+      }
+      //lastHeroPosition = { i: i, j: j };
     }
     //when we encounter a blank that does not represent a potential move,
     //it means no potential previous moves, so we reset

@@ -23,7 +23,13 @@ const GameContainer: React.FC = () => {
     setColor(color);
   };
 
-  const newGame = () => {
+  const handleStartGame = () => {
+    setStart(false);
+  };
+
+  const handleNewGame = () => {
+    setColor('');
+    setScore({ b: 2, w: 2, current: 'b' });
     setStart(true);
   };
 
@@ -31,13 +37,18 @@ const GameContainer: React.FC = () => {
   return (
     <div className="GameContainer">
       <span className="GameContainer_watermark">Othello</span>
-      <Score score={score} updateColor={updatePlayerColorChoice} start={start} />
+      <Score
+        score={score}
+        updateColor={updatePlayerColorChoice}
+        newGame={start}
+        startGame={handleStartGame}
+      />
       {color && (
         <GameBoard
           gameState={initialGameboard}
           updateScore={handleScoreChange}
           playerColor={color}
-          newGame={newGame}
+          newGame={handleNewGame}
         />
       )}
     </div>

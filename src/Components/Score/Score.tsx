@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import './Score.css';
 
@@ -11,19 +11,22 @@ type score = {
 interface iScore {
   score: score;
   updateColor: (color: string) => void;
-  start: boolean;
+  newGame: boolean;
+  startGame: () => void;
 }
 
 const Score: React.FC<iScore> = (props) => {
-  const { score, updateColor } = props;
-  console.log('in Score ', props.start);
-  const [start, setStart] = useState<boolean>(props.start);
+  const { score, updateColor, newGame, startGame } = props;
+  const [start, setStart] = useState<boolean>(newGame);
+
+  if (newGame !== start) setStart(newGame);
 
   const handleChoiceClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!start) return;
+    if (!newGame) return;
     const value = e.currentTarget.getAttribute('data-id');
     updateColor(value!);
-    setStart(!start);
+    setStart(false);
+    startGame();
   };
 
   return (
