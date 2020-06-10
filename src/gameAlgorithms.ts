@@ -28,10 +28,13 @@ export function searchForMoves(gameBoard: string[][], playerColor: string) {
     lastPotentialMove: iPosition | null = null,
     lastHeroPosition: iPosition | null = null
   ) => {
-    if (i >= gameBoard.length - 1 || j >= gameBoard.length - 1 || i < 0 || j < 0) return;
+    if (i >= gameBoard.length || j >= gameBoard.length || i < 0 || j < 0) return;
 
     const current = gameBoard[i][j];
-    const next = gameBoard[i + incrementI][j + incrementJ];
+    let next: string | null = null;
+    try {
+      next = gameBoard[i + incrementI][j + incrementJ];
+    } catch (e) {}
 
     //check for case of blank square followed by opponent owned square
     //we remember the blank square in case a move is possible further down the line
@@ -49,7 +52,9 @@ export function searchForMoves(gameBoard: string[][], playerColor: string) {
     //and mark playable if lastHeroPosition not null
     else if (isOpponent(playerColor, current) && !next) {
       if (lastHeroPosition) {
-        markedBoard[i + incrementI][j + incrementJ] = 'p';
+        const row = i + incrementI;
+        const column = j + incrementJ;
+        if (row < gameBoard.length && column < gameBoard.length) markedBoard[row][column] = 'p';
         lastHeroPosition = null;
       }
     }
@@ -88,7 +93,7 @@ export function searchForMoves(gameBoard: string[][], playerColor: string) {
   return markedBoard;
 }
 
-function isOpponent(playerColor: string, square: string) {
+function isOpponent(playerColor: string, square: string | null) {
   if (!square) return false;
   if (square === playerColor) return false;
   return true;
@@ -155,6 +160,13 @@ export function getBoardCount(gameBoard: string[][]) {
   return { b: blackCount, w: whiteCount, p: pCount };
 }
 
+export function getRandomMove(gameBoard: string[][]) {
+  const possibleMoves: iPosition[] = [];
+  gameBoard.map((row, i) => row.forEach((square, j) => square === 'p' && possibleMoves.push({ i: i, j: j })));
+  console.log(possibleMoves);
+
+  return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+}
 // export function testMapRowColumnOrDiagonalMoves() {
 //   let testArrs = [
 //     ['', '', '', '', '', '', '', ''],

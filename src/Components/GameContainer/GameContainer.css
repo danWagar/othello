@@ -10,6 +10,22 @@
       -ms-flex-align: center;
           align-items: center;
   width: 100%;
+  height: 100%;
   color: white;
+}
+
+@media (min-width: 1024px) {
+  .GameContainer_watermark {
+    position: fixed;
+    top: -10rem;
+    left: 0;
+    width: 100%;
+    font-size: 25rem;
+    font-weight: bold;
+    text-align: center;
+    color: rgba(225, 225, 225, 0.006);
+    z-index: -1;
+    overflow: none;
+  }
 }
 /*# sourceMappingURL=GameContainer.css.map */
