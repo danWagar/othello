@@ -50,6 +50,7 @@ $border: 2px solid rgba(30, 30, 30, 0.6);
   background-color: rgb(20, 20, 20);
 
   & button {
+    cursor: pointer;
     padding: 10px 15px 10px 15px;
     background-color: rgba(200, 60, 60, 0.7);
     font-weight: bold;
@@ -64,13 +65,5 @@ $border: 2px solid rgba(30, 30, 30, 0.6);
   .Gameboard_row li {
     height: 60px;
     width: 60px;
-  }
-}
-
-@media (min-width: 900px) {
-  .Gameboard_game_over {
-    position: fixed;
-    width: 70%;
-    left: 15%;
   }
 }

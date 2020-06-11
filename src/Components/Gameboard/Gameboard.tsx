@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { GameContext } from '../../Context/GameContext';
-import initialGameboard from '../../initialGameboard';
 import GamePiece from '../GamePiece/GamePiece';
+import GameOver from '../GameOver/GameOver';
+import { useStatistics } from '../../statistics';
 import {
   searchForMoves,
   updateBoard,
@@ -11,21 +12,26 @@ import {
 } from '../../gameAlgorithms';
 import './Gameboard.css';
 
+interface iCounts {
+  b: number;
+  w: number;
+  p: number;
+}
+
 //our gameboard is a 2d string array where the empty string represents a blank square,
 //'w' represents a square occupied by the white player
 //'b' represents a square occupied by the black player
 //'p' represents potential moves for current player (after being passed through search algorithm)
-interface iScore {
-  b: number;
-  w: number;
-  current: string;
-}
 
 const Gameboard: React.FC = () => {
   const { game, setGame } = useContext(GameContext);
 
-  const { gameOver, playerColor, currentPlayerTurn } = game;
+  const { gameOver, playerColor, currentPlayerTurn, initialGameboard, score } = game;
   const [gameBoard, setGameBoard] = useState<string[][]>(initialGameboard);
+
+  const statistics = useStatistics();
+
+  let startTime = Date.now();
 
   useEffect(() => {
     if (gameOver) return;
@@ -35,7 +41,9 @@ const Gameboard: React.FC = () => {
 
     const counts = getBoardCount(boardCopy);
 
-    setGame({ ...game, score: { b: counts.b, w: counts.w } });
+    const newScore = { b: counts.b, w: counts.w };
+
+    setGame({ ...game, score: { ...newScore } });
 
     if (checkGameOver(counts, currentPlayerTurn, boardCopy)) {
       setGame({ ...game, gameOver: true });
@@ -51,24 +59,38 @@ const Gameboard: React.FC = () => {
           switchTurns();
           return;
         }
-        handleBoardUpdate(move.i, move.j);
-      }, 200);
+        handleBoardUpdate(move.i, move.j, counts);
+      }, 700);
     }
   }, [currentPlayerTurn]);
 
   const switchTurns = () => {
+    startTime = Date.now();
     setGame({ ...game, currentPlayerTurn: currentPlayerTurn === 'w' ? 'b' : 'w' });
   };
 
-  const handleBoardUpdate = async (i: number, j: number) => {
-    const changedBoard = await updateBoard(gameBoard, i, j, currentPlayerTurn);
-    console.log('changed board is ', changedBoard);
+  const handleBoardUpdate = (i: number, j: number, oldCounts?: iCounts) => {
+    const changedBoard = updateBoard(gameBoard, i, j, currentPlayerTurn);
+    let oldScore: { b: number; w: number } | null = null;
+
+    const counts = getBoardCount(changedBoard);
+    if (oldCounts) oldScore = { b: oldCounts.b, w: oldCounts.w };
+    const newScore = { b: counts.b, w: counts.w };
+
+    statistics.updateStatistics(
+      newScore,
+      Date.now() - startTime,
+      currentPlayerTurn,
+      playerColor as 'w' | 'b',
+      oldScore || score
+    );
+
     setGameBoard(changedBoard);
     switchTurns();
   };
 
   const handleSquareClick = (e: React.MouseEvent<HTMLLIElement>) => {
-    if (currentPlayerTurn !== playerColor) return;
+    //if (currentPlayerTurn !== playerColor) return;
 
     const row = parseInt(e.currentTarget.getAttribute('data-row')!);
     const column = parseInt(e.currentTarget.getAttribute('data-column')!);
@@ -76,18 +98,6 @@ const Gameboard: React.FC = () => {
     if (gameBoard[row][column] !== 'p') return;
 
     handleBoardUpdate(row, column);
-  };
-
-  const handleNewGameClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setGame({
-      ...game,
-      playerColor: '',
-      currentPlayerTurn: 'b',
-      gameOver: false,
-      start: false,
-      score: { b: 2, w: 2 },
-    });
-    setGameBoard(initialGameboard);
   };
 
   const getGameboardJSX = () => {
@@ -106,12 +116,7 @@ const Gameboard: React.FC = () => {
 
   return (
     <div className="Gameboard">
-      {gameOver && (
-        <div className="Gameboard_game_over">
-          <span>Game Over!</span>
-          <button onClick={handleNewGameClick}>New Game</button>
-        </div>
-      )}
+      {gameOver && <GameOver statistics={statistics.getStatistics()} />}
       {getGameboardJSX()}
     </div>
   );

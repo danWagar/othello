@@ -10,7 +10,7 @@ const Score: React.FC = () => {
   const handleChoiceClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (start) return;
 
-    const value = e.currentTarget.getAttribute('data-id');
+    const value = e.currentTarget.getAttribute('data-id') as 'w' | 'b' | '';
 
     setGame({ ...game, playerColor: value!, start: true });
   };
@@ -25,7 +25,7 @@ const Score: React.FC = () => {
         <span className="Score_player">Black</span>
         <div className="Score_score">{score.b}</div>
       </div>
-      {start && <div>Choose a color</div>}
+      {!start && <div>Choose a color</div>}
       <div
         className={classNames('Score_container', { Score_highlight: currentPlayerTurn === 'w' })}
         data-id="w"

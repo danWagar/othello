@@ -1,4 +1,5 @@
 import React, { Dispatch, SetStateAction, createContext, useState } from 'react';
+import initialGameboard from '../initialGameboard';
 
 type Props = {
   children: React.ReactNode;
@@ -12,10 +13,11 @@ type Score = {
 export type Game = {
   score: Score;
   currentPlayerTurn: string;
-  playerColor: string;
+  playerColor: 'w' | 'b' | '';
   displayMoves: boolean;
   gameOver: boolean;
   start: boolean;
+  initialGameboard: string[][];
 };
 
 type Context = {
@@ -31,6 +33,7 @@ const initialContext: Context = {
     displayMoves: true,
     gameOver: false,
     start: false,
+    initialGameboard: initialGameboard,
   },
   setGame: (value: SetStateAction<Game>) => {},
 };

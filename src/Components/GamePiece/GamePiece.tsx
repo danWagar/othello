@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Properties } from 'csstype';
+import { GameContext } from '../../Context/GameContext';
 
 interface iGamePiece {
   type: string;
@@ -7,6 +8,10 @@ interface iGamePiece {
 
 const GamePiece: React.FC<iGamePiece> = (props) => {
   const { type } = props;
+
+  const { game } = useContext(GameContext);
+
+  const { displayMoves } = game;
 
   const pieceStyle: Properties = {
     height: '85%',
@@ -35,8 +40,8 @@ const GamePiece: React.FC<iGamePiece> = (props) => {
 
   const getStyle = () => {
     if (type === 'w') return whitePiece;
-    else if (type === 'b') return blackPiece;
-    else if (type === 'p') return possibleMove;
+    if (type === 'b') return blackPiece;
+    if (type === 'p' && displayMoves) return possibleMove;
     return {};
   };
 
