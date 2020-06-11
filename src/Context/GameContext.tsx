@@ -5,7 +5,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-type Score = {
+export type Score = {
   b: number;
   w: number;
 };

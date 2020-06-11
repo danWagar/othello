@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { GameContext } from '../../Context/GameContext';
+import { GameContext, Score } from '../../Context/GameContext';
 import GamePiece from '../GamePiece/GamePiece';
 import GameOver from '../GameOver/GameOver';
 import { useStatistics } from '../../statistics';
@@ -10,6 +10,7 @@ import {
   getRandomMove,
   checkGameOver,
 } from '../../gameAlgorithms';
+import { getMinMaxMove } from '../../alphaBeta';
 import './Gameboard.css';
 
 interface iCounts {
@@ -43,35 +44,62 @@ const Gameboard: React.FC = () => {
 
     const newScore = { b: counts.b, w: counts.w };
 
-    setGame({ ...game, score: { ...newScore } });
+    //setGame({ ...game, score: { ...newScore } });
 
     if (checkGameOver(counts, currentPlayerTurn, boardCopy)) {
-      setGame({ ...game, gameOver: true });
+      setGame({ ...game, score: { ...newScore }, gameOver: true });
       return;
-    }
+    } else setGame({ ...game, score: { ...newScore } });
 
     if (counts.p === 0) switchTurns();
 
     if (currentPlayerTurn !== playerColor) {
-      const move = getRandomMove(boardCopy);
+      //const move = getRandomMove(boardCopy);
+
       setTimeout(() => {
+        const move = getMinMaxMove(boardCopy, playerColor === 'w' ? 'b' : 'w', 2);
+        console.log(move);
         if (!move) {
           switchTurns();
           return;
         }
         handleBoardUpdate(move.i, move.j, counts);
-      }, 700);
+        // handleNextBoard(nextBoardState, counts);
+      }, 100);
     }
   }, [currentPlayerTurn]);
 
+  const handleNextBoard = (nextBoard: string[][], oldCounts: iCounts) => {
+    //const changedBoard = updateBoard(gameBoard, i, j, currentPlayerTurn);
+    const strippedPlaysBoard = nextBoard.map((row) => row.map((square) => (square === 'p' ? '' : square)));
+
+    let oldScore: Score | null = null;
+
+    const counts = getBoardCount(nextBoard);
+    if (oldCounts) oldScore = { b: oldCounts.b, w: oldCounts.w };
+    const newScore = { b: counts.b, w: counts.w };
+
+    statistics.updateStatistics(
+      newScore,
+      Date.now() - startTime,
+      currentPlayerTurn,
+      playerColor as 'w' | 'b',
+      oldScore || score
+    );
+
+    setGameBoard(strippedPlaysBoard);
+    switchTurns();
+  };
+
   const switchTurns = () => {
+    console.log('switching turns');
     startTime = Date.now();
     setGame({ ...game, currentPlayerTurn: currentPlayerTurn === 'w' ? 'b' : 'w' });
   };
 
   const handleBoardUpdate = (i: number, j: number, oldCounts?: iCounts) => {
     const changedBoard = updateBoard(gameBoard, i, j, currentPlayerTurn);
-    let oldScore: { b: number; w: number } | null = null;
+    let oldScore: Score | null = null;
 
     const counts = getBoardCount(changedBoard);
     if (oldCounts) oldScore = { b: oldCounts.b, w: oldCounts.w };

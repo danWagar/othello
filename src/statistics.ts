@@ -43,13 +43,11 @@ export function useStatistics() {
     ) => {
       const opponentColor = playerColor === 'w' ? 'b' : 'w';
 
-      console.log(score);
-
       if (currentPlayerTurn === playerColor) {
         heroNumberMoves++;
         heroTotalPiecesCaptured += score[opponentColor] - newScore[opponentColor];
-        console.log('hero caputred ', score[opponentColor] - newScore[opponentColor], ' pieces');
         heroTotalTime += time;
+
         setStatistics({
           ...statistics,
           heroNumberMoves: heroNumberMoves,
@@ -59,11 +57,6 @@ export function useStatistics() {
       } else {
         opponentNumberMoves++;
         opponentTotalPiecesCaptured += score[playerColor as colors] - newScore[playerColor as colors];
-        console.log(
-          'opponent caputred ',
-          score[playerColor as colors] - newScore[playerColor as colors],
-          ' pieces'
-        );
         opponentTotalTime += time;
 
         setStatistics({
@@ -74,8 +67,8 @@ export function useStatistics() {
         });
       }
     },
+
     getStatistics: () => {
-      console.log(statistics);
       return statistics;
     },
   };

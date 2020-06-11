@@ -170,9 +170,15 @@ export function getBoardCount(gameBoard: string[][]) {
   return { b: blackCount, w: whiteCount, p: pCount };
 }
 
-export function getRandomMove(gameBoard: string[][]) {
+function getPossibleMoves(gameBoard: string[][]) {
   const possibleMoves: iPosition[] = [];
   gameBoard.map((row, i) => row.forEach((square, j) => square === 'p' && possibleMoves.push({ i: i, j: j })));
+
+  return possibleMoves;
+}
+
+export function getRandomMove(gameBoard: string[][]) {
+  const possibleMoves = getPossibleMoves(gameBoard);
 
   const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
 
@@ -199,4 +205,51 @@ export function checkGameOver(counts: iCounts, playerTurn: string, gameBoard: st
   if (counts.b === 0 || counts.w === 0) return true;
 
   return false;
+}
+
+export function getPossibleBoardStates(gameBoard: string[][], currentPlayer: string) {
+  const possibleMoves = getPossibleMoves(gameBoard);
+
+  const possibleBoards = possibleMoves.map((move) => {
+    return { board: updateBoard(gameBoard, move.i, move.j, currentPlayer), move: move };
+  });
+
+  const possibleBoardsWithMoves = possibleBoards.map((board) => {
+    return { board: searchForMoves(board.board, currentPlayer), move: board.move };
+  });
+
+  return possibleBoardsWithMoves;
+}
+
+export function getUtility(
+  gameBoard: string[][],
+  move: iPosition,
+  playerColor: string,
+  counts: iCounts,
+  isMax: boolean
+) {
+  if (isMax === false) console.log('isMax is false');
+  //console.log('in getUtility isMax is ', isMax);
+  let value = 0;
+  const opponent = playerColor === 'w' ? 'b' : 'w';
+  const length = gameBoard.length - 1;
+  const { i, j } = move;
+  if (
+    (i === 0 && j === 0) ||
+    (i === 0 && j === length) ||
+    (i === length && j === 0) ||
+    (i === length && j === length)
+  ) {
+    value = Number.POSITIVE_INFINITY;
+  } else if (counts.b + counts.w <= (gameBoard.length * gameBoard.length) / 3) value = counts.p;
+  else value = counts[playerColor as 'w' | 'b'] - counts[opponent];
+
+  if (checkGameOver(counts, playerColor, gameBoard)) return 0;
+  else {
+    if (isMax) {
+      return value;
+    } else {
+      return -value;
+    }
+  }
 }
