@@ -27,7 +27,7 @@ interface iCounts {
 const Gameboard: React.FC = () => {
   const { game, setGame } = useContext(GameContext);
 
-  const { gameOver, playerColor, currentPlayerTurn, initialGameboard, score } = game;
+  const { gameOver, playerColor, currentPlayerTurn, initialGameboard, score, difficulty } = game;
   const [gameBoard, setGameBoard] = useState<string[][]>(initialGameboard);
 
   const statistics = useStatistics();
@@ -44,8 +44,6 @@ const Gameboard: React.FC = () => {
 
     const newScore = { b: counts.b, w: counts.w };
 
-    //setGame({ ...game, score: { ...newScore } });
-
     if (checkGameOver(counts, currentPlayerTurn, boardCopy)) {
       setGame({ ...game, score: { ...newScore }, gameOver: true });
       return;
@@ -54,45 +52,33 @@ const Gameboard: React.FC = () => {
     if (counts.p === 0) switchTurns();
 
     if (currentPlayerTurn !== playerColor) {
-      //const move = getRandomMove(boardCopy);
+      console.log('difficulty is ', difficulty);
+      let move: { i: number; j: number } | null;
+      let depth = 3;
+      if (difficulty === 'easy') move = getRandomMove(boardCopy);
+      else {
+        let totalPieces = counts.b + counts.w;
+        if (totalPieces > 45) depth = 4;
+        else if (totalPieces > 50) depth = 5;
+        else if (totalPieces > 55) depth = 6;
+      }
 
-      setTimeout(() => {
-        const move = getMinMaxMove(boardCopy, playerColor === 'w' ? 'b' : 'w', 2);
-        console.log(move);
-        if (!move) {
-          switchTurns();
-          return;
-        }
-        handleBoardUpdate(move.i, move.j, counts);
-        // handleNextBoard(nextBoardState, counts);
-      }, 100);
+      setTimeout(
+        () => {
+          if (difficulty === 'normal')
+            move = getMinMaxMove(boardCopy, playerColor === 'w' ? 'b' : 'w', depth);
+          if (!move) {
+            switchTurns();
+            return;
+          }
+          handleBoardUpdate(move.i, move.j, counts);
+        },
+        difficulty === 'easy' ? 700 : 100
+      );
     }
   }, [currentPlayerTurn]);
 
-  const handleNextBoard = (nextBoard: string[][], oldCounts: iCounts) => {
-    //const changedBoard = updateBoard(gameBoard, i, j, currentPlayerTurn);
-    const strippedPlaysBoard = nextBoard.map((row) => row.map((square) => (square === 'p' ? '' : square)));
-
-    let oldScore: Score | null = null;
-
-    const counts = getBoardCount(nextBoard);
-    if (oldCounts) oldScore = { b: oldCounts.b, w: oldCounts.w };
-    const newScore = { b: counts.b, w: counts.w };
-
-    statistics.updateStatistics(
-      newScore,
-      Date.now() - startTime,
-      currentPlayerTurn,
-      playerColor as 'w' | 'b',
-      oldScore || score
-    );
-
-    setGameBoard(strippedPlaysBoard);
-    switchTurns();
-  };
-
   const switchTurns = () => {
-    console.log('switching turns');
     startTime = Date.now();
     setGame({ ...game, currentPlayerTurn: currentPlayerTurn === 'w' ? 'b' : 'w' });
   };
@@ -118,7 +104,7 @@ const Gameboard: React.FC = () => {
   };
 
   const handleSquareClick = (e: React.MouseEvent<HTMLLIElement>) => {
-    //if (currentPlayerTurn !== playerColor) return;
+    if (currentPlayerTurn !== playerColor) return;
 
     const row = parseInt(e.currentTarget.getAttribute('data-row')!);
     const column = parseInt(e.currentTarget.getAttribute('data-column')!);

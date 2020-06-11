@@ -18,14 +18,30 @@ const GameContainer: React.FC = () => {
     setGame({ ...game, displayMoves: !value });
   };
 
+  const handleDifficultySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.currentTarget.value as 'easy' | 'normal';
+    setGame({ ...game, difficulty: value });
+  };
+
+  const labelStyle = { display: game.start ? 'inline-block' : 'none' };
+
   return (
     <div className="GameContainer">
       <span className="GameContainer_watermark">Othello</span>
       <Score />
-      <label style={{ display: game.start ? 'inline-block' : 'none' }}>
-        <input type="checkbox" onClick={handleHideMovesSelect} />
-        Hide Moves
-      </label>
+      <div className="GameContainer_options">
+        <label style={labelStyle}>
+          <input type="checkbox" onClick={handleHideMovesSelect} />
+          Hide Moves
+        </label>
+        <label style={labelStyle}>
+          Difficulty
+          <select onChange={handleDifficultySelect}>
+            <option value="easy">Easy (Random AI)</option>
+            <option value="normal">Normal (AlphaBeta AI)</option>
+          </select>
+        </label>
+      </div>
       {game.playerColor && <GameBoard />}
     </div>
   );

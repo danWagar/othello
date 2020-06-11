@@ -17,6 +17,7 @@ export type Game = {
   displayMoves: boolean;
   gameOver: boolean;
   start: boolean;
+  difficulty: 'easy' | 'normal';
   initialGameboard: string[][];
 };
 
@@ -33,6 +34,7 @@ const initialContext: Context = {
     displayMoves: true,
     gameOver: false,
     start: false,
+    difficulty: 'easy',
     initialGameboard: initialGameboard,
   },
   setGame: (value: SetStateAction<Game>) => {},

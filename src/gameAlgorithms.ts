@@ -12,12 +12,12 @@ if we find hero piece followed by an opponent piece, search until we encounter a
 we iterate through the 2d array in 4 directions so O(4*n^2) -> O(n^2)
 */
 
-interface iPosition {
+export interface iPosition {
   i: number;
   j: number;
 }
 
-interface iCounts {
+export interface iCounts {
   b: number;
   w: number;
   p: number;
@@ -219,37 +219,4 @@ export function getPossibleBoardStates(gameBoard: string[][], currentPlayer: str
   });
 
   return possibleBoardsWithMoves;
-}
-
-export function getUtility(
-  gameBoard: string[][],
-  move: iPosition,
-  playerColor: string,
-  counts: iCounts,
-  isMax: boolean
-) {
-  if (isMax === false) console.log('isMax is false');
-  //console.log('in getUtility isMax is ', isMax);
-  let value = 0;
-  const opponent = playerColor === 'w' ? 'b' : 'w';
-  const length = gameBoard.length - 1;
-  const { i, j } = move;
-  if (
-    (i === 0 && j === 0) ||
-    (i === 0 && j === length) ||
-    (i === length && j === 0) ||
-    (i === length && j === length)
-  ) {
-    value = Number.POSITIVE_INFINITY;
-  } else if (counts.b + counts.w <= (gameBoard.length * gameBoard.length) / 3) value = counts.p;
-  else value = counts[playerColor as 'w' | 'b'] - counts[opponent];
-
-  if (checkGameOver(counts, playerColor, gameBoard)) return 0;
-  else {
-    if (isMax) {
-      return value;
-    } else {
-      return -value;
-    }
-  }
 }

@@ -1,8 +1,9 @@
-import { getBoardCount, checkGameOver, getPossibleBoardStates, getUtility } from './gameAlgorithms';
+import { getBoardCount, checkGameOver, getPossibleBoardStates, iPosition, iCounts } from './gameAlgorithms';
 
 export function getMinMaxMove(gameBoard: string[][], currentPlayer: string, maxDepth: number) {
   let result: { i: number; j: number } | null = null;
   let max = Number.NEGATIVE_INFINITY;
+  let startTime = Date.now();
 
   const opponent = currentPlayer === 'w' ? 'b' : 'w';
 
@@ -20,8 +21,12 @@ export function getMinMaxMove(gameBoard: string[][], currentPlayer: string, maxD
 
     const counts = getBoardCount(gameBoard);
 
-    if (depth === maxDepth || checkGameOver(counts, currentPlayer, gameBoard)) {
-      return getUtility(gameBoard, move, currentPlayer, counts, true);
+    if (
+      depth === maxDepth ||
+      checkGameOver(counts, currentPlayer, gameBoard) ||
+      Date.now() - startTime > 4000
+    ) {
+      return getUtility(gameBoard, move, isMaximizingPlayer ? currentPlayer : opponent, counts, true);
     }
 
     if (isMaximizingPlayer) {
@@ -31,7 +36,7 @@ export function getMinMaxMove(gameBoard: string[][], currentPlayer: string, maxD
         let value = miniMax(
           childBoardStates[i].board,
           childBoardStates[i].move,
-          false,
+          true,
           alpha,
           beta,
           depth + 1
@@ -43,7 +48,6 @@ export function getMinMaxMove(gameBoard: string[][], currentPlayer: string, maxD
       return bestVal;
     } else {
       let bestVal = Number.POSITIVE_INFINITY;
-
       for (let i = 0; i < childBoardStates.length; i++) {
         let value = miniMax(
           childBoardStates[i].board,
@@ -62,19 +66,65 @@ export function getMinMaxMove(gameBoard: string[][], currentPlayer: string, maxD
   };
 
   for (let i = 0; i < boardStates.length; i++) {
-    let value = miniMax(
-      boardStates[i].board,
-      boardStates[i].move,
-      true,
-      Number.NEGATIVE_INFINITY,
-      Number.POSITIVE_INFINITY,
-      0
-    );
+    let move = boardStates[i].move;
+    let board = boardStates[i].board;
+
+    if (checkCorners(move.i, move.j, gameBoard.length - 1)) {
+      result = move;
+      break;
+    }
+
+    let value = miniMax(board, move, true, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 0);
     if (value > max) {
       max = value;
-      result = boardStates[i].move;
+      result = move;
     }
   }
 
   return result;
+}
+
+export function getUtility(
+  gameBoard: string[][],
+  move: iPosition,
+  playerColor: string,
+  counts: iCounts,
+  isMax: boolean
+) {
+  let value = 0;
+  const opponent = playerColor === 'w' ? 'b' : 'w';
+  const length = gameBoard.length - 1;
+  const { i, j } = move;
+  if (counts.b + counts.w <= (gameBoard.length * gameBoard.length) / 2) value = -counts.p;
+  else value = counts[playerColor as 'w' | 'b'];
+
+  if (
+    (i === 0 && j === 0) ||
+    (i === 0 && j === length) ||
+    (i === length && j === 0) ||
+    (i === length && j === length)
+  ) {
+    value *= 8;
+  } else if (i === 0 || j === 0 || i === length || j === length) {
+    value *= 2;
+  }
+
+  if (checkGameOver(counts, playerColor, gameBoard)) return 0;
+  else {
+    if (isMax) {
+      return value;
+    } else {
+      return -value;
+    }
+  }
+}
+
+function checkCorners(i: number, j: number, lastIndex: number) {
+  if (
+    (i === 0 && j === 0) ||
+    (i === 0 && j === lastIndex) ||
+    (i === lastIndex && j === 0) ||
+    (i === lastIndex && j === lastIndex)
+  )
+    return true;
 }

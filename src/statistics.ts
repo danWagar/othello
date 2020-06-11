@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { GameContext } from './Context/GameContext';
+import { useState } from 'react';
 
-type colors = 'w' | 'b';
+type Colors = 'w' | 'b';
 
 export type Statistics = {
   heroNumberMoves: number;
@@ -38,7 +37,7 @@ export function useStatistics() {
       newScore: { w: number; b: number },
       time: number,
       currentPlayerTurn: string,
-      playerColor: 'w' | 'b',
+      playerColor: Colors,
       score: { w: number; b: number }
     ) => {
       const opponentColor = playerColor === 'w' ? 'b' : 'w';
@@ -56,7 +55,7 @@ export function useStatistics() {
         });
       } else {
         opponentNumberMoves++;
-        opponentTotalPiecesCaptured += score[playerColor as colors] - newScore[playerColor as colors];
+        opponentTotalPiecesCaptured += score[playerColor as Colors] - newScore[playerColor as Colors];
         opponentTotalTime += time;
 
         setStatistics({
