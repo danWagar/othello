@@ -4,15 +4,17 @@ import { GameContext } from '../../Context/GameContext';
 
 interface iGamePiece {
   type: string;
+  wasLastMove: boolean;
 }
 
 const GamePiece: React.FC<iGamePiece> = (props) => {
-  const { type } = props;
+  const { type, wasLastMove } = props;
 
   const { game } = useContext(GameContext);
 
   const { displayMoves } = game;
 
+  //ultimately no real reason these styles need to be inline
   const pieceStyle: Properties = {
     height: '85%',
     width: '85%',
@@ -38,11 +40,19 @@ const GamePiece: React.FC<iGamePiece> = (props) => {
     border: '3px solid rgba(235, 60, 60, .6)',
   };
 
+  const lastMoveStyle: Properties = {
+    border: '2px solid #3730ff',
+  };
+
   const getStyle = () => {
-    if (type === 'w') return whitePiece;
-    if (type === 'b') return blackPiece;
-    if (type === 'p' && displayMoves) return possibleMove;
-    return {};
+    let style: Properties = {};
+    if (type === 'w') style = whitePiece;
+    else if (type === 'b') style = blackPiece;
+    else if (type === 'p' && displayMoves) style = possibleMove;
+
+    if (wasLastMove) style = { ...style, ...lastMoveStyle };
+
+    return style;
   };
 
   return <div style={getStyle()}></div>;

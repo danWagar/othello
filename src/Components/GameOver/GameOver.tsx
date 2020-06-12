@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { GameContext } from '../../Context/GameContext';
 import { Statistics } from '../../statistics';
+import Stat from '../Stat/Stat';
 import './GameOver.css';
 
 interface iGameOver {
@@ -23,9 +24,15 @@ const GameOver: React.FC<iGameOver> = (props) => {
 
   const { playerColor, score } = game;
 
+  const heroCapturePerTurn = (heroTotalPiecesCaptured / heroNumberMoves).toFixed(1);
+  const opponentCapturePerTurn = (opponentTotalPiecesCaptured / opponentNumberMoves).toFixed(1);
+  const heroSecondsPerTurn = (heroTotalTime / heroNumberMoves / 1000).toFixed(2);
+  const opponentSecondsPerTurn = (opponentTotalTime / opponentNumberMoves / 1000).toFixed(2);
+
   const getWinner = () => {
     if (score[playerColor as 'w' | 'b'] > score[playerColor === 'w' ? 'b' : 'w']) return 'You Won!';
-    return 'You Lost';
+    else if (score[playerColor as 'w' | 'b'] < score[playerColor === 'w' ? 'b' : 'w']) return 'You Lost';
+    return 'You Tied';
   };
 
   const handleNewGameClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -41,15 +48,9 @@ const GameOver: React.FC<iGameOver> = (props) => {
 
   return (
     <div className="GameOver">
-      <span>{getWinner()}</span>{' '}
-      <ul className="GameOver_list">
-        <li>You captured {(heroTotalPiecesCaptured / heroNumberMoves).toFixed(1)} pieces per turn</li>
-        <li>Your opponent captured {(opponentTotalPiecesCaptured / opponentNumberMoves).toFixed(1)} </li>
-        <li>You took {(heroTotalTime / heroNumberMoves / 1000).toFixed(2)} seconds per move</li>
-        <li>
-          Your opponent took {(opponentTotalTime / opponentNumberMoves / 1000).toFixed(2)} seconds per move
-        </li>
-      </ul>
+      <span>{getWinner()}</span>
+      <Stat title={'Captures Per Turn'} heroStat={heroCapturePerTurn} opponentStat={opponentCapturePerTurn} />
+      <Stat title={'Seconds Per Turn'} heroStat={heroSecondsPerTurn} opponentStat={opponentSecondsPerTurn} />
       <button onClick={handleNewGameClick}>New Game</button>
     </div>
   );

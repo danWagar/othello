@@ -34,7 +34,7 @@ const initialContext: Context = {
     displayMoves: true,
     gameOver: false,
     start: false,
-    difficulty: 'easy',
+    difficulty: 'normal',
     initialGameboard: initialGameboard,
   },
   setGame: (value: SetStateAction<Game>) => {},

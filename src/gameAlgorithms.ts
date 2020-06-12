@@ -62,7 +62,8 @@ export function searchForMoves(gameBoard: string[][], playerColor: string) {
       if (lastHeroPosition) {
         const row = i + incrementI;
         const column = j + incrementJ;
-        if (row < gameBoard.length && column < gameBoard.length) markedBoard[row][column] = 'p';
+        if (row < gameBoard.length && column < gameBoard.length && row >= 0 && column >= 0)
+          markedBoard[row][column] = 'p';
         lastHeroPosition = null;
       }
     }
@@ -95,9 +96,9 @@ export function searchForMoves(gameBoard: string[][], playerColor: string) {
     //map left to right 'downward' sloping diagonals
     mapMoves(0, i, 1, -1);
     //map left to right 'upward' sloping diagonals
-    mapMoves(gameBoard.length, i, -1, 1);
+    mapMoves(gameBoard.length - 1, i, -1, 1);
     //map right to left 'upward' sloping diagonals
-    mapMoves(gameBoard.length, i, -1, -1);
+    mapMoves(gameBoard.length - 1, i, -1, -1);
   }
 
   return markedBoard;

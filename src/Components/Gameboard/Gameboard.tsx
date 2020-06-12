@@ -19,6 +19,11 @@ interface iCounts {
   p: number;
 }
 
+interface iMove {
+  i: number;
+  j: number;
+}
+
 //our gameboard is a 2d string array where the empty string represents a blank square,
 //'w' represents a square occupied by the white player
 //'b' represents a square occupied by the black player
@@ -29,6 +34,7 @@ const Gameboard: React.FC = () => {
 
   const { gameOver, playerColor, currentPlayerTurn, initialGameboard, score, difficulty } = game;
   const [gameBoard, setGameBoard] = useState<string[][]>(initialGameboard);
+  const [lastMove, setLastMove] = useState<iMove | null>(null);
 
   const statistics = useStatistics();
 
@@ -103,6 +109,7 @@ const Gameboard: React.FC = () => {
       oldScore || score
     );
 
+    setLastMove({ i: i, j: j });
     setGameBoard(changedBoard);
     switchTurns();
   };
@@ -124,7 +131,7 @@ const Gameboard: React.FC = () => {
         <ul key={i} className="Gameboard_row">
           {row.map((square, j) => (
             <li key={j} data-row={i} data-column={j} onClick={handleSquareClick}>
-              <GamePiece type={square} />
+              <GamePiece type={square} wasLastMove={!!lastMove && lastMove.i === i && lastMove.j === j} />
             </li>
           ))}
         </ul>
