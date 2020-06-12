@@ -49,18 +49,20 @@ const Gameboard: React.FC = () => {
       return;
     } else setGame({ ...game, score: { ...newScore } });
 
-    if (counts.p === 0) switchTurns();
+    if (counts.p === 0) {
+      switchTurns();
+      return;
+    }
 
-    if (currentPlayerTurn !== playerColor) {
-      console.log('difficulty is ', difficulty);
+    if (currentPlayerTurn !== playerColor && difficulty !== 'none') {
       let move: { i: number; j: number } | null;
-      let depth = 3;
+      let depth = 5;
       if (difficulty === 'easy') move = getRandomMove(boardCopy);
       else {
         let totalPieces = counts.b + counts.w;
-        if (totalPieces > 45) depth = 4;
-        else if (totalPieces > 50) depth = 5;
-        else if (totalPieces > 55) depth = 6;
+        if (totalPieces > 45) depth = 6;
+        else if (totalPieces > 50) depth = 7;
+        else if (totalPieces > 55) depth = 10;
       }
 
       setTimeout(
@@ -68,6 +70,8 @@ const Gameboard: React.FC = () => {
           if (difficulty === 'normal')
             move = getMinMaxMove(boardCopy, playerColor === 'w' ? 'b' : 'w', depth);
           if (!move) {
+            //This should not happen
+            console.log('Error: AI did not return a result');
             switchTurns();
             return;
           }
@@ -104,7 +108,7 @@ const Gameboard: React.FC = () => {
   };
 
   const handleSquareClick = (e: React.MouseEvent<HTMLLIElement>) => {
-    if (currentPlayerTurn !== playerColor) return;
+    if (currentPlayerTurn !== playerColor && difficulty !== 'none') return;
 
     const row = parseInt(e.currentTarget.getAttribute('data-row')!);
     const column = parseInt(e.currentTarget.getAttribute('data-column')!);

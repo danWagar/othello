@@ -21,6 +21,13 @@ const GameOver: React.FC<iGameOver> = (props) => {
 
   const { game, setGame } = useContext(GameContext);
 
+  const { playerColor, score } = game;
+
+  const getWinner = () => {
+    if (score[playerColor as 'w' | 'b'] > score[playerColor === 'w' ? 'b' : 'w']) return 'You Won!';
+    return 'You Lost';
+  };
+
   const handleNewGameClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setGame({
       ...game,
@@ -34,7 +41,7 @@ const GameOver: React.FC<iGameOver> = (props) => {
 
   return (
     <div className="GameOver">
-      <span>Game Over!</span>{' '}
+      <span>{getWinner()}</span>{' '}
       <ul className="GameOver_list">
         <li>You captured {(heroTotalPiecesCaptured / heroNumberMoves).toFixed(1)} pieces per turn</li>
         <li>Your opponent captured {(opponentTotalPiecesCaptured / opponentNumberMoves).toFixed(1)} </li>

@@ -1,0 +1,27 @@
+.GameOptions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 450px;
+  padding: 10px;
+}
+
+.GameOptions_difficulty {
+  margin-left: 7px;
+  padding: 4px;
+  background-color: rgb(29, 29, 29);
+  color: white;
+  border: 1px solid rgb(48, 48, 48);
+  border-radius: 5px;
+
+  & option {
+    padding: 4px;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@media (min-width: 750px) {
+}

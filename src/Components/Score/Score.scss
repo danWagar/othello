@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   width: 340px;
-  height: 150px;
+  height: 120px;
   font-family: 'Lato', sans-serif;
   font-weight: bold;
 }
@@ -34,4 +34,55 @@
 
 .Score_highlight {
   background-color: rgba(200, 60, 60, 0.6);
+}
+
+.Score_choose {
+  font-size: 1.3rem;
+  color: rgb(200, 60, 60);
+}
+
+.Score_choose_color_black {
+  animation: pulse 3s infinite;
+
+  & .Score_score {
+    opacity: 0;
+  }
+}
+
+.Score_choose_color_white {
+  animation: pulse_alt 3s infinite;
+
+  & .Score_score {
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(24, 24, 24, 0.6);
+  }
+  50% {
+    background-color: rgba(79, 79, 79, 0.6);
+  }
+  100% {
+    background-color: rgba(24, 24, 24, 0.6);
+  }
+}
+
+@keyframes pulse_alt {
+  0% {
+    background-color: rgba(79, 79, 79, 0.6);
+  }
+  50% {
+    background-color: rgba(24, 24, 24, 0.6);
+  }
+  100% {
+    background-color: rgba(79, 79, 79, 0.6);
+  }
+}
+
+@media (min-width: 750px) {
+  .Score {
+    height: 150px;
+  }
 }

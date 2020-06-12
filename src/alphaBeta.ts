@@ -22,9 +22,9 @@ export function getMinMaxMove(gameBoard: string[][], currentPlayer: string, maxD
     const counts = getBoardCount(gameBoard);
 
     if (
-      depth === maxDepth ||
       checkGameOver(counts, currentPlayer, gameBoard) ||
-      Date.now() - startTime > 4000
+      depth === maxDepth ||
+      Date.now() - startTime > 5000
     ) {
       return getUtility(gameBoard, move, isMaximizingPlayer ? currentPlayer : opponent, counts, true);
     }
@@ -75,7 +75,8 @@ export function getMinMaxMove(gameBoard: string[][], currentPlayer: string, maxD
     }
 
     let value = miniMax(board, move, true, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 0);
-    if (value > max) {
+    //
+    if (value >= max) {
       max = value;
       result = move;
     }
@@ -104,10 +105,13 @@ export function getUtility(
     (i === length && j === 0) ||
     (i === length && j === length)
   ) {
-    value *= 8;
+    value *= 1000;
   } else if (i === 0 || j === 0 || i === length || j === length) {
-    value *= 2;
+    value *= 10;
   }
+
+  if (isMax && counts.p === 0) value = Number.NEGATIVE_INFINITY;
+  else value = Number.POSITIVE_INFINITY;
 
   if (checkGameOver(counts, playerColor, gameBoard)) return 0;
   else {

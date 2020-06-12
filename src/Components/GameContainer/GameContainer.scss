@@ -7,8 +7,13 @@
   color: white;
 }
 
+.GameContainer_watermark {
+  display: none;
+}
+
 @media (min-width: 1024px) {
   .GameContainer_watermark {
+    display: inline-block;
     position: fixed;
     top: -10rem;
     left: 0;

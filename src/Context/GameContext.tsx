@@ -17,7 +17,7 @@ export type Game = {
   displayMoves: boolean;
   gameOver: boolean;
   start: boolean;
-  difficulty: 'easy' | 'normal';
+  difficulty: 'easy' | 'normal' | 'none';
   initialGameboard: string[][];
 };
 
